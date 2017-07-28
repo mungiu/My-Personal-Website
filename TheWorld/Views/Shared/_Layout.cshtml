@@ -2,12 +2,12 @@
 <html>
 
 <head>
-    <title>My World - @ViewBag.Title</title>
+    <title>My World @ViewBag.Title</title>
     <meta charset="utf-8" />
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    @* mounting bootstrat (bootswatch) skin "superhero" *@
-    <link rel="stylesheet" href="~/lib/bootswatch/flatly/bootstrap.min.css" />
+    @* mounting bootstrat (bootswatch) skin *@
+    <link rel="stylesheet" href="~/lib/bootswatch/yeti/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 
@@ -17,7 +17,7 @@
     <div id="sidebar">
         <img src="~/img/Andrei.jpg" alt="headshot" class="headshot" />
         <span id="username">Andrei Mungiu</span>
-        <ul class="menu">
+        <ul class="nav">
             <li class="active"><a asp-controller="App" asp-action="Index">Home</a></li>
             <li><a asp-controller="App" asp-action="About">About</a></li>
             <li><a asp-controller="App" asp-action="Contact">Contact</a></li>
@@ -25,17 +25,38 @@
     </div>
 
     <div id="wrapper">
-        <div id="main">
-            <div>
-                <button id="sidebarToggle" class="btn btn-primary">
-                    <i class="fa fa-angle-left"></i>
-                </button>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav navbar-left">
+                    <li>
+                        <button id="sidebarToggle" class="btn btn-primary">
+                            <i class="fa fa-angle-left"></i>
+                        </button>
+                    </li>
+                </ul>
+                <a asp-controller="App" asp-action="Index " class="navbar-brand">My World</a>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" class="btn btn-sm bt-info">
+                            <i class="fa fa-save"></i>Save
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="btn btn-sm bt-info">
+                            <i class="fa fa-print"></i>Print
+                        </a>
+                    </li>
+                </ul>
             </div>
-            @*injecting page body content*@ 
-           @RenderBody()
+        </nav>
+        <div id="main" class="container-fluid">
+            @*injecting page body content*@
+            @RenderBody()
         </div>
-        <div id="footer">
-            &copy; 2017 My World Ltd.
+            <div id="footer" class="container-fluid">
+                <div class="navbar navbar-inverse navbar-fixed-bottom">
+                    <h4 class="text-center text-info">&copy; 2017 Andrei Mungiu Ltd.</h4>
+                </div>
         </div>
     </div>
 
