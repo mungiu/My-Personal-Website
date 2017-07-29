@@ -6,22 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// This represents the access to the database itself
+/// </summary>
 namespace TheWorld.Models
 {
-    //database related
     public class WorldContext : DbContext
     {
-        private IConfigurationRoot _config;
-
         //ctor
+        private IConfigurationRoot _config;
         public WorldContext(IConfigurationRoot config, DbContextOptions options) 
             : base(options)
         {
             _config = config;
         }
 
-        //classes that we can execute LINQ queries against
-        //these are starting points for queriable interfaces
+        //exposing "entity types" as properties of "DbSet type"
+        //now we can execute LINQ queries against "Trips/Stops"
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Stop> Stops { get; set; }
 
@@ -29,7 +30,8 @@ namespace TheWorld.Models
         {
             base.OnConfiguring(optionsBuilder);
 
-            optionsBuilder.UseSqlServer(_config["ConnectionStrings:WorldContextConnection"]);
+            optionsBuilder.UseSqlServer
+                (_config["ConnectionStrings:WorldContextConnection"]);
         }
     }
 }

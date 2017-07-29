@@ -17,7 +17,6 @@ namespace TheWorld
     {
         private IHostingEnvironment _env;
         private IConfigurationRoot _config;
-
         public Startup(IHostingEnvironment env)
         {
             _env = env;
@@ -29,6 +28,7 @@ namespace TheWorld
 
             _config = builder.Build();
         }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -37,22 +37,28 @@ namespace TheWorld
 
             if (_env.IsEnvironment("Development") || _env.IsEnvironment("Testing"))
             {
-                //creates an instance of the service as soon as it actualy needs it
+                //creates service instance when required
                 services.AddScoped<IMailService, DebugMailService>();
             }
             else
             {
-                //Implement a real Mail Service
+                //TODO Implement real Mail Service
             }
 
-            //makes it injectible
+            //registering services 
+            //which will now be injectible in different parts of project
             services.AddDbContext<WorldContext>();
-
-                services.AddMvc();
+            services.AddScoped<IWorldRepository, WorldRepository>();
+            services.AddTransient<WorldContextSeedData>();
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(
+            IApplicationBuilder app, 
+            IHostingEnvironment env, 
+            ILoggerFactory loggerFactory,
+            WorldContextSeedData seeder)
         {
             if (env.IsEnvironment("Development"))
             {
@@ -70,6 +76,8 @@ namespace TheWorld
                 defaults: new { controller = "App", action = "Index" }
                 );
             });
+            //calling a synchronious operaton (cannot be asynch)
+            seeder.EnsureSeedData().Wait();
         }
     }
 }
