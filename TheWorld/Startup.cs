@@ -29,6 +29,7 @@ namespace TheWorld
 
             _config = builder.Build();
         }
+        
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -44,15 +45,20 @@ namespace TheWorld
             {
                 //Implement a real Mail Service
             }
-
+            
             //makes it injectible
             services.AddDbContext<WorldContext>();
-
-                services.AddMvc();
+            //transient creates it every time we need it
+            services.AddTransient<WorldContextSeedData>();
+            services.AddMvc();
         }
 
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, 
+            IHostingEnvironment env, 
+            ILoggerFactory loggerFactory,
+            WorldContextSeedData seeder)
         {
             if (env.IsEnvironment("Development"))
             {
@@ -61,7 +67,7 @@ namespace TheWorld
 
             //serving the request
             app.UseStaticFiles();
-            //the router
+            //router
             app.UseMvc(config =>
             {
             config.MapRoute(
@@ -70,6 +76,9 @@ namespace TheWorld
                 defaults: new { controller = "App", action = "Index" }
                 );
             });
+
+            //calling "worldseeddata" as a synchronious operation
+            seeder.EnsureSeedData().Wait();
         }
     }
 }
