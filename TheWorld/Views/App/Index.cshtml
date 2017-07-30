@@ -1,4 +1,4 @@
-﻿@*@model IEnumerable<TheWorld.Models.Trip>*@
+﻿@model IEnumerable<TheWorld.Models.Trip>
 @{ 
     //recording current page title
     ViewBag.Title = "Home Page";
@@ -31,9 +31,10 @@
         <ul>
             @foreach (var item in Model)
             {
-                <li>@item.Name</li>
+                <li>@item.Name : @item.DateCreated.ToString("d") </li>
             }
         </ul>
         
     </div>
+
 </div>

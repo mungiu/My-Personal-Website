@@ -29,13 +29,16 @@ namespace TheWorld
             _config = builder.Build();
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        // This method gets called by the runtime. 
+        // Use this method to add services to the container.
+        // For more information on how to configure your application, 
+        // visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(_config);
 
-            if (_env.IsEnvironment("Development") || _env.IsEnvironment("Testing"))
+            if (_env.IsEnvironment("Development") || 
+                _env.IsEnvironment("Testing"))
             {
                 //creates service instance when required
                 services.AddScoped<IMailService, DebugMailService>();
@@ -51,18 +54,28 @@ namespace TheWorld
             services.AddScoped<IWorldRepository, WorldRepository>();
             services.AddTransient<WorldContextSeedData>();
             services.AddMvc();
+            services.AddLogging();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // This method gets called by the runtime. 
+        // Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app, 
             IHostingEnvironment env, 
             ILoggerFactory loggerFactory,
-            WorldContextSeedData seeder)
+            WorldContextSeedData seeder,
+            ILoggerFactory factory)
         {
             if (env.IsEnvironment("Development"))
             {
-            app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
+                //logging error info
+                factory.AddDebug(LogLevel.Information);
+            }
+            else
+            {
+                //logging error messages
+                factory.AddDebug(LogLevel.Error);
             }
 
             //serving the request
@@ -72,7 +85,7 @@ namespace TheWorld
             {
             config.MapRoute(
                 name: "Default",
-                template: "{controller}/{action}/{id?}",    //id is now optional
+                template: "{controller}/{action}/{id?}", //id is now optional
                 defaults: new { controller = "App", action = "Index" }
                 );
             });

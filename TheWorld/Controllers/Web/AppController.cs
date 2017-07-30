@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,26 +17,39 @@ namespace TheWorld.Controllers.Web
         private IMailService _mailService;
         private IConfigurationRoot _config;
         private IWorldRepository _repository;
+        private ILogger<AppController> _logger;
+
         //ctor
         public AppController(
             IMailService mailService, 
             IConfigurationRoot config, 
-            IWorldRepository repository)
+            IWorldRepository repository,
+            ILogger<AppController> logger)
         {
             //storing data
             _mailService = mailService;
             _config = config;
             _repository = repository;
+            _logger = logger;
         }
 
 
         public IActionResult Index()
         {
-            //querying for trips
-            var data = _repository.GetAllTrips();
-
-            return View(data);
+            //catching and logging errors
+            try
+            {
+                //querying for trips
+                var data = _repository.GetAllTrips();
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to get trips in Index page: {ex.Message}");
+                return Redirect("/error");
+            }
         }
+
 
         public IActionResult Contact()
         {
@@ -45,15 +59,15 @@ namespace TheWorld.Controllers.Web
         [HttpPost]
         public IActionResult Contact(ContactViewModel model)
         {
-            if (model.Email.Contains("@asd.asd")) ModelState.AddModelError("Email", "We dont support ASD addresses");
+            if (model.Email.Contains("@asd.asd"))
+                ModelState.AddModelError("Email", "We dont support ASD addresses");
 
             if (ModelState.IsValid)
             {
-                _mailService.SendMail(_config["MailSettings:ToAddress"], model.Email, "From AndreiMungiu.com", model.Message);
-
+                _mailService.SendMail(_config["MailSettings:ToAddress"], 
+                    model.Email, "From AndreiMungiu.com", model.Message);
                 //cleans form after send
                 ModelState.Clear();
-
                 ViewBag.UserMessage = "Message Sent";
             }
             return View();
