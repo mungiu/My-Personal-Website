@@ -15,7 +15,8 @@ namespace TheWorld.Models
     {
         //ctor
         private IConfigurationRoot _config;
-        public WorldContext(IConfigurationRoot config, DbContextOptions options) 
+        public WorldContext(IConfigurationRoot config, 
+            DbContextOptions options) 
             : base(options)
         {
             _config = config;
@@ -26,7 +27,8 @@ namespace TheWorld.Models
         public DbSet<Trip> Trips { get; set; }
         public DbSet<Stop> Stops { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(
+            DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
 
