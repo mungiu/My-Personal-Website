@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,12 +23,45 @@ namespace TheWorld.Models
             _logger = logger;
         }
 
+        public void AddStop(string tripName, Stop newStop)
+        {
+            var trip = GetTripByName(tripName);
+
+            if (trip != null)
+            {
+                //foreign key is being set
+                trip.Stops.Add(newStop);
+                //foreign key added as new object
+                _context.Stops.Add(newStop);
+            }
+        }
+
+        public void AddTrip(Trip trip)
+        {
+            //pushing into the context as a new object
+            _context.Add(trip);
+        }
 
         public IEnumerable<Trip> GetAllTrips()
         {
             //logging messages
             _logger.LogInformation("Getting all trips from the Database");
             return _context.Trips.ToList();
+        }
+
+        public Trip GetTripByName(string tripName)
+        {
+            //LAMDA - selection of individual property to be included
+            return _context.Trips
+                .Include(t => t.Stops)
+                .Where(t => t.Name == tripName)
+                .FirstOrDefault();
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            //comparing result of awaited bool operation
+            return (await _context.SaveChangesAsync()) > 0;
         }
     }
 }

@@ -10,6 +10,9 @@ using Microsoft.Extensions.Logging;
 using TheWorld.Services;
 using Microsoft.Extensions.Configuration;
 using TheWorld.Models;
+using Newtonsoft.Json.Serialization;
+using AutoMapper;
+using TheWorld.ViewModels;
 
 namespace TheWorld
 {
@@ -28,6 +31,7 @@ namespace TheWorld
 
             _config = builder.Build();
         }
+
 
         // This method gets called by the runtime. 
         // Use this method to add services to the container.
@@ -53,9 +57,16 @@ namespace TheWorld
             services.AddDbContext<WorldContext>();
             services.AddScoped<IWorldRepository, WorldRepository>();
             services.AddTransient<WorldContextSeedData>();
-            services.AddMvc();
             services.AddLogging();
+            services.AddMvc()
+                .AddJsonOptions(config =>
+                {
+                    //making sure properties are cammel cased
+                    config.SerializerSettings.ContractResolver = 
+                    new CamelCasePropertyNamesContractResolver();
+                });
         }
+
 
         // This method gets called by the runtime. 
         // Use this method to configure the HTTP request pipeline.
@@ -66,10 +77,17 @@ namespace TheWorld
             WorldContextSeedData seeder,
             ILoggerFactory factory)
         {
+            //configuring maps (bidirectional mapping)
+            Mapper.Initialize(config =>
+            {
+                config.CreateMap<TripViewModel, Trip>().ReverseMap();
+                config.CreateMap<StopViewModel, Stop>().ReverseMap();
+            });
+
             if (env.IsEnvironment("Development"))
             {
                 app.UseDeveloperExceptionPage();
-                //logging error info
+                //logging error info to debug streem
                 factory.AddDebug(LogLevel.Information);
             }
             else
