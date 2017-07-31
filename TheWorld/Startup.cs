@@ -56,6 +56,7 @@ namespace TheWorld
             //which will now be injectible in different parts of project
             services.AddDbContext<WorldContext>();
             services.AddScoped<IWorldRepository, WorldRepository>();
+            services.AddTransient<GeoCoordsService>();
             services.AddTransient<WorldContextSeedData>();
             services.AddLogging();
             services.AddMvc()

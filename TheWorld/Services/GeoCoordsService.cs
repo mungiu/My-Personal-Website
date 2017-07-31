@@ -47,6 +47,7 @@ namespace TheWorld.Services
 
             // Read out the results
             // Fragile, might need to change if the Bing API changes
+            // Need help tweaking towards Google maps API?
             var results = JObject.Parse(json);
             var resources = results["resourceSets"][0]["resources"];
             if (!resources.HasValues)
@@ -69,6 +70,8 @@ namespace TheWorld.Services
                     result.Message = "Success";
                 }
             }
+
+            return result;
 
         }
     }
